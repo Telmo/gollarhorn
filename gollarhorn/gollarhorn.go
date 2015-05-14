@@ -18,16 +18,16 @@ type Client struct {
 	client    *http.Client
 	BaseURL   *url.URL
 	UserAgent string
-	Character CharacterService
+	Character *CharacterService
 }
 
-func NewClient(httpClient *http.Client) Client {
+func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseURL := url.Parse(defaultBaseURL)
+	baseURL, _ := url.Parse(defaultBaseURL)
 
-	c := Client{
+	c := &Client{
 		client:    httpClient,
 		BaseURL:   baseURL,
 		UserAgent: defaultUserAgent,
@@ -58,7 +58,6 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	req.Header.Add("Accept", mediaTypeV3)
 	if c.UserAgent != "" {
 		req.Header.Add("User-Agent", c.UserAgent)
 	}
@@ -66,7 +65,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 }
 
 func (cleint *Client) Do(req *http.Request) (*http.Response, error) {
-	resp, err := cleint.Client.Do(req)
+	resp, err := cleint.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

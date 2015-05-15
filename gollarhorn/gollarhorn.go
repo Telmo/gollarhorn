@@ -16,6 +16,8 @@ const (
 	defaultUserAgent   = "gollarhorn/" + version
 )
 
+type ResponseData map[string]interface{}
+
 var platforms = map[string]int{
 	"xbox":   1,
 	"psn":    2,
@@ -29,6 +31,7 @@ type Client struct {
 	UserAgent   string
 	Character   *CharacterService
 	Player      *PlayerService
+	Platform    *PlatformService
 }
 
 func NewClient(httpClient *http.Client) *Client {
@@ -44,6 +47,8 @@ func NewClient(httpClient *http.Client) *Client {
 		PlatformURL: platURL,
 		UserAgent:   defaultUserAgent,
 	}
+
+	c.Platform = &PlatformService{client: c}
 	c.Character = &CharacterService{client: c}
 	c.Player = &PlayerService{client: c}
 	return c
@@ -91,12 +96,4 @@ func (cleint *Client) Do(req *http.Request, v interface{}) (*http.Response, erro
 	}
 
 	return resp, nil
-}
-
-type PlatformResponse struct {
-	ErrorCode       *int         `json: ErrorCode`
-	ThrottleSeconds *float64     `json: ThrottleSeconds`
-	ErrorStatus     *string      `json: ErrorStatus`
-	Message         *string      `json: Message`
-	MessageData     *interface{} `json: MessageData, omitempty`
 }
